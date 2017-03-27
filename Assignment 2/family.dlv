@@ -1,0 +1,69 @@
+% Assignment: Checking Data Integrity with Datalog (Getting Started file..)
+
+% EDB (Extensional Database) -- FACTS
+% parent(X,Y) means X is_parent_of Y.
+parent(william, john).
+parent(john, james).
+parent(james, bill).
+parent(sue, bill).
+parent(james, carol).
+parent(sue, carol).
+
+male(john).
+male(james).
+male(bill).
+
+female(sue).
+female(carol).
+
+% IDB (Intensional Database) -- RULES
+grandparent(X, Y) :- 
+	parent(X, Z), parent(Z, Y).
+father(X, Y) :- 
+	parent(X, Y), male(X).
+mother(X, Y) :- 
+	parent(X, Y), female(X).
+brother(X, Y) :- 
+	parent(P, X), parent(P, Y), male(X), X != Y.
+sister(X, Y) :- 
+	parent(P, X), parent(P, Y), female(X), X != Y.
+
+% A recursive query/view: 
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).
+
+% descendant(X,Y) means X is a descendant of Y.
+descendant(X, Y) :- ancestor(Y, X).
+
+% sibling(X,Y) means X and Y share a parent P.
+% If there is no distinction between sibling(X1,X2) and sibling(X2,X1), then we can use X<Y instead.
+sibling(X, Y) :- parent(P, X), parent(P, Y), X != Y.
+
+
+% ICs (Integrity Constraints) -- RULES to find "bad" (inconsistent) data
+
+% Warm-up
+% Assume the IC says: "every person must have a parent".
+% How can we guarantee that?
+% 
+% First we find persons who do NOT violate the constraint,
+% that is, we find persons who have parents: 
+% 
+has_parent(X) :- parent(_, X).
+
+% person(X) means X is a parent or a child.
+person(X) :- parent(X,_).
+person(X) :- parent(_,X).
+
+% Now we can easily find persons who violate the has_parent constraint.
+% We can use a convention, e.g., "icv_NNN" to mark [i]ntegrity [c]onstraint [v]iolations
+% 
+icv_no_parent(X) :- person(X), not has_parent(X).
+
+% Mom & Dad
+% Every person has a father and a mother.
+has_mom_and_dad(X) :- mother(M, X), father(F, X), M != F.
+
+% icv_no_mom_or_dad(X) means any person who does not have a mom or dad.
+icv_no_mom_or_dad(X) :- person(X), not has_mom_and_dad(X).
+

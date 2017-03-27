@@ -1,0 +1,78 @@
+% Assignment 2, Problem 2
+
+% EDB (Extensional Database) -- FACTS
+
+% Assume that the table is available as a Datalog predicate of the form 
+% publication(I, A, Y, T, J, V, N, F, L, P).
+
+% Here are some entries, loosely based on the records shown on the assignment
+publication(6755, hyatt, 1872, fossil, bullmcz, 5, 5, 91, 9, publisher1).
+publication(2580, rolfe, 1962, phyllocarid, breviora, 151, 151, 4, 6, mcz).
+publication(2044, bather, 1934, chelonechinus, gsa, 45, 4, 808, 832, null).
+publication(4407, kummel, 1969, ammonoids, bullmcz, 137, 3, 476, null, publisher2).
+
+% Some additional publication to test IC violation
+publication(4407, doe, 2015, foobar, bullmcz, 10, 1, 10, 1, null).
+
+% cites(Pid1, Pid2) says that Pid1 is citing Pid2, i.e., Pid2 is cited.
+cites(4711, 2020).
+cites(4711, 3799).
+cites(3799, 2580).
+
+% Some more citations to test IC violation
+
+cites(2580, 2044).
+cites(2044, 2580).
+
+% ICs (Integrity Constraints) -- RULES to find "bad" (inconsistent) data
+
+% Problem 2a FD-1: if a row agrees with another row on the key attribute PID, 
+% then it should agree on ALL other attributes. 
+% I suppose null value should also be reported.
+
+icv_fd1(author_violation,X,Y1,Y2) :- publication(X,Y1,_,_,_,_,_,_,_,_), publication(X,Y2,_,_,_,_,_,_,_,_), Y1 < Y2.
+icv_fd1(year_violation,X,Y1,Y2) :- publication(X,_,Y1,_,_,_,_,_,_,_), publication(X,_,Y2,_,_,_,_,_,_,_), Y1 < Y2.
+icv_fd1(title_violation,X,Y1,Y2) :- publication(X,_,_,Y1,_,_,_,_,_,_), publication(X,_,_,Y2,_,_,_,_,_,_), Y1 < Y2.
+icv_fd1(journal_violation,X,Y1,Y2) :- publication(X,_,_,_,Y1,_,_,_,_,_), publication(X,_,_,_,Y2,_,_,_,_,_), Y1 < Y2.
+icv_fd1(vol_violation,X,Y1,Y2) :- publication(X,_,_,_,_,Y1,_,_,_,_), publication(X,_,_,_,_,Y2,_,_,_,_), Y1 < Y2.
+icv_fd1(no_violation,X,Y1,Y2) :- publication(X,_,_,_,_,_,Y1,_,_,_), publication(X,_,_,_,_,_,Y2,_,_,_), Y1 < Y2.
+icv_fd1(fp_violation,X,Y1,Y2) :- publication(X,_,_,_,_,_,_,Y1,_,_), publication(X,_,_,_,_,_,_,Y2,_,_), Y1 < Y2.
+icv_fd1(lp_violation,X,Y1,Y2) :- publication(X,_,_,_,_,_,_,_,Y1,_), publication(X,_,_,_,_,_,_,_,Y2,_), Y1 < Y2.
+icv_fd1(publisher_violation,X,Y1,Y2) :- publication(X,_,_,_,_,_,_,_,_,Y1), publication(X,_,_,_,_,_,_,_,_,Y2), Y1 < Y2. 
+
+% Problem 2a FD-2: every journal has a single publisher
+% I suppose null value should also be reported.
+
+icv_fd2(J,P1,P2) :- publication(_, _, _, _, J, _, _, _, _, P1), publication(_, _, _, _, J, _, _, _, _, P2), P1 < P2.
+
+% Problem 2a NC-1: The last page Lp cannot be smaller than the first page Fp
+% I suppose null value for a page number is not a violation.
+
+icv_nc1(I,F,L) :- publication(I, _, _, _, _, _, _, F, L, _), F != null, L != null, F > L.
+
+% Problem 2b ID (Inclusion Dependency): 
+% Every cited publication in CITES also occurs in PUBLICATION.
+% Note: Publications P2 in the second column of cites(P1,P2) constitute all 
+% *cited* publications, so checking P1 isn't required!
+% (If P1 is included, all *citing* and *cited* pubs are checked for inclusion
+%  in the Publication table. Wasn't required but is a useful check, too.)
+
+% Auxiliary relation: Unary relation to collect just the pub-ids.
+pub_id(I) :- publication(I,_,_,_,_,_,_,_,_,_).
+
+% The CITES[P2] \subseteq PUBLICATION[Pid] is violated if there is a P2 
+% that's not among the pubs in PUBLICATION:
+icv_id(cited,I) :- cites(_,I), not pub_id(I).
+
+% If you want to check *citing* articles as well, use this rule:
+icv_id(citing,I) :- cites(I,_), not pub_id(I).
+
+% Problem 2b NC-2: If P1 cites P2 then P2's year of publication 
+% cannot be greater than P1.
+
+icv_nc2(I1,I2,Y1,Y2) :-
+	cites(I1,I2),
+	publication(I1,_,Y1,_,_,_,_,_,_,_),
+	publication(I2,_,Y2,_,_,_,_,_,_,_),
+	Y1 < Y2.
+
