@@ -1,0 +1,52 @@
+# @begin Coorinates_Transformation @desc Display one or more greetings to the user.
+# @param x
+# @param y
+
+# @out zipcodes @desc Greeting displayed to user.
+# @out scatter_plot_data @desc hehe
+# @out new_map @desc new plot with Google API
+
+    # @begin Value_Conversion_Combine @desc Convert x, y to numeric value
+    # @param latitude @as x
+    # @param longitude @as y
+    
+    # @out produce_numeric @as numeric_lat_lon
+    # @end Value_Conversion_Combine
+    
+    # @begin Facet @desc Scatter Plot Facet
+    # @in branch1 @as numeric_lat_lon
+    # @out branch1 @as scatter_plot_data @file stream:stdout
+    # @end Facet
+
+    # @begin Coordinate_Processing @desc Format with (lat,lon)
+    # @in input_numeric @as numeric_lat_lon
+    # @out input_numeric @as coordinates_tuple
+    # @end Coordinate_Preprocessing
+    
+    # @begin Google_Map 
+    # @in branch2 @as numeric_lat_lon
+    # @out branch2 @as add_layers
+    # @end Google_Map
+    
+    # @begin Add_Layers @desc Set(x,y) to position placemarks
+    # @in sub_branch @as add_layers
+    # @out sub_branch @as new_map @file X->lon,Y->lat
+    # @end Add_Layers
+    
+    # @begin Coordinate_Preprocessing @desc Format with (lat,lon)
+    # @in input_numeric @as numeric_lat_lon
+    # @out input_numeric @as coordinates_tuple
+    # @end Coordinate_Preprocessing
+    
+    # @begin Geocode_Reversing @desc Reverse Geo coordianetes with Google API
+    # @in test2 @as coordinates_tuple
+    # @out test2 @as json_file_with_zipcode
+    # @end Geocode_Reversing
+    
+    # @begin Zipcode_Extract @desc Extract zipcode
+    # @in test @as json_file_with_zipcode
+    # @out test @as zipcodes @file stream:stdout
+    # @end Zipcode_Extract
+
+# @end Zipcode_Reverse_Processing
+

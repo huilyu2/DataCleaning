@@ -1,0 +1,35 @@
+# @begin ZipCode_Validation @desc Display one or more greetings to the user.
+# @param zip
+# @param API
+
+# @out consistency 
+# @out others 
+# @out warning_file
+# @out filled_geo_zip
+
+    # @begin zip_api_Compare @desc Calculate difference between original zipcode and api-produced zipcode
+    # @param zipcode @as zip
+    # @param GeoPostal_code @as API
+    
+    # @out produce_numeric @as consistency
+    # @out zip(not_null)_geo(null) 
+    # @out zip(null)_geo(nout_null)
+    # @out other_situation @as others @file stream:stdout
+    # @end zip_api_Compare
+    
+    # @begin Zipcode_extraction @desc Manually get zip based on x and y
+    # @in branch1 @as zip(not_null)_geo(null) 
+    # @out branch1 @as zip(manual)
+    # @end Zipcode_extraction
+
+    # @begin zip_manual_Compare @desc Calculate difference between original zipcode and manually produced zipcode
+    # @in input_numeric @as zip(manual)
+    # @out input_numeric @as warning_file @file stream:stdout
+    # @end zip_manual_Compare
+    
+    # @begin Geo_zip_Conversion
+    # @in branch2 @as zip(null)_geo(nout_null)
+    # @out branch2 @as filled_geo_zip @file stream:stdout
+    # @end Geo_zip_Conversion
+
+# @end ZipCode_Validation

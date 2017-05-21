@@ -1,0 +1,16 @@
+# @begin farmer_market @desc Exercise YW with a classic program.
+
+# @in farmers_markets.csv
+# @out final_farmaers_markets.csv @desc Greeting displayed to user.
+
+# @begin OpenRefine_Processing @desc Preprocessing zipcode checking
+# @in greeting1 @as farmers_markets.csv
+# @out greeting1 @as openrefine-farmers-markets.csv
+# @end OpenRefine_Processing
+
+# @begin SQL_Processing @desc Processing timedate, zipcode
+# @in greeting2 @as openrefine-farmers-markets.csv
+# @out greeting2 @as final_farmaers_markets.csv @file stream:stdout
+# @end SQL_Processing
+
+# @end farmer_market

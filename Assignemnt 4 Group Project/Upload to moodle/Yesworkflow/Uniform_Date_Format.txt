@@ -1,0 +1,30 @@
+# @begin Uniform_Date_Format @desc Display one or more greetings to the user.
+# @param updateTime
+# @param Season1Date
+# @param Season2Date
+# @param Season3Date
+# @param Season4Date
+
+# @out SQL_Date_Cleaned_results
+
+    # @begin Capture_(common_space)_format
+    # @param updateTime
+    # @param Season1Date
+    # @param Season2Date
+    # @param Season3Date
+    # @param Season4Date
+    # @out produce_numeric @as problematic_date_result
+    # @end Value_Conversion_Combine
+    
+    # @begin Month_Format_Uniform @desc Update month format
+    # @in first_step @as problematic_date_result
+    # @out first_step @as update_date_result_v1
+    # @end Month_Format_Uniform
+    
+    # @begin Year_Format_Uniform @desc Update year format
+    # @in second_step @as update_date_result_v1
+    # @out second_step @as SQL_Date_Cleaned_results @file stream:stdout
+    # @end Year_Format_Uniform
+    
+   
+# @end Uniform_Date_Format

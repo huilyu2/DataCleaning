@@ -1,0 +1,51 @@
+# @begin String_Columns_Transformation @desc Display one or more greetings to the user.
+# @param MarketName
+# @param Website
+# @param Facebook
+# @param Twitter
+# @param Youtube
+# @param OtherMedia
+# @param street
+# @param city
+# @param county
+# @param state
+# @param Organic
+
+# @out OpenRefine_Cleaned_results @desc Greeting displayed to user.
+    # @begin Collapse_Consecutive_whitespace
+    # @param MarketName
+    # @param Website
+    # @param Facebook
+    # @param Twitter
+    # @param Youtube
+    # @param OtherMedia
+    # @param street
+    # @param city
+    # @param county
+    # @param state
+    # @param Organic    
+    # @out produce_numeric @as temp_result_1
+    # @end Value_Conversion_Combine
+    
+    # @begin Trim_Value @desc Delete leading and trailing spaces
+    # @in first_step @as temp_result_1
+    # @out first_step @as temp_result_2
+    # @end Trim_Value
+    
+    # @begin Correction_Typo @desc Correct URL typo
+    # @in second_step @as temp_result_2
+    # @out second_step @as temp_result_3
+    # @end Correction
+    
+    # @begin Cluster_Merge @desc Method: Key collssion; Keying function: (N-gram, fingerprint)
+    # @in third_step @as temp_result_3
+    # @out third_step @as temp_result_4
+    # @end Cluster_Merge
+    
+    # @begin Unify_NULL @desc replace none, no, n/a, '-' with blank 
+    # @in last_step @as temp_result_4
+    # @out last_step @as OpenRefine_Cleaned_results @file stream:stdout
+    # @end Unify_Null
+   
+
+# @end String_Columns_Transformation
